@@ -4,33 +4,26 @@ import {
   Button,
   Card,
   CardBody,
-  Center,
-  Grid,
-  GridItem,
+  CardFooter,
   Image,
   Input,
   SimpleGrid,
   Text,
   UnorderedList,
 } from "@chakra-ui/react";
-import { Spinner } from "@chakra-ui/react";
-import downlaodicon from "../assets/download.png";
 import { FaDownload } from "react-icons/fa";
 import { RiDeleteBack2Line } from "react-icons/ri";
 import axios from "axios";
-import "./test.scss";
+import "./genral.scss";
 export const pagedataexport = {};
 
 const PetGrid = () => {
-  const [doginfo, setDoginfo] = useState([]);
-  const [search, setsearch] = useState("dog");
-  const [saveddogo, setsaveddogo] = useState([]);
-  const [isloading, setisloading] = useState(false);
+  const [doginfo, setDoginfo] = useState([]); //fetched data
+  const [search, setsearch] = useState("dog"); // search
+  const [saveddogo, setsaveddogo] = useState([]); //saved data
   const ismobile = window.innerWidth <= 750;
-  const [issavebutton, setissavebutton] = useState(false);
   //fetches the data
   useEffect(() => {
-    setisloading(true);
     axios
       .get(`https://api.api-ninjas.com/v1/dogs?name=${search}`, {
         headers: {
@@ -46,11 +39,9 @@ const PetGrid = () => {
           }))
         );
         console.log("success");
-        setisloading(false);
       })
       .catch((err) => {
         console.log(err);
-        setisloading(false);
       });
   }, [search]);
 
@@ -58,29 +49,42 @@ const PetGrid = () => {
     const exist = saveddogo.find((obj) => obj.Image === dogo.Image);
 
     if (exist) {
-      return alert("Already Saved");
+      return alert("Already Saved"); // wont save the dogo if exist
     }
-    setsaveddogo(saveddogo.concat(dogo));
+    setsaveddogo(saveddogo.concat(dogo)); // adding the the dogo to the list
   };
 
   const deletedogo = (dogo) => {
+    //filter out the new dogo list without the deleted dogo
     setsaveddogo(
       saveddogo.filter((innerdogo) => innerdogo.Image !== dogo.Image)
     );
   };
 
   const downloader = (image) => {
+    //uses a third party package file-save to downlode the image
     let url = image;
     saveAs(url, "dog-imaeg");
   };
 
   return (
-    <div>
+    //STRUCTURE
+    //headdiv - two rows > 1st row == navbar , 2nd row == col1(dogoGrid) , col2( savedDogolist)
+
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+      }}
+    >
       <div
         className="div-search"
         style={{
+          position: "relative",
           display: "flex",
           justifyContent: "center",
+          justifySelf: "center",
         }}
       >
         <Input
@@ -91,7 +95,15 @@ const PetGrid = () => {
           margin={2}
         />
       </div>
-      <div style={{ display: "flex", flexDirection: "row", width: "100%" }}>
+      <div
+        style={{
+          display: "flex",
+          width: "window",
+          flexdirection: "row",
+          padding: "0",
+          margin: "0",
+        }}
+      >
         <div className="div-grid" style={{ minWidth: "80%" }}>
           <SimpleGrid
             columns={{ sm: 1, md: 2, lg: 3, xl: 4 }}
@@ -101,68 +113,75 @@ const PetGrid = () => {
             {doginfo.map((dogobj) => {
               return (
                 <Card overflow={"hidden"} borderRadius={25}>
-                  <a href={dogobj.Image} download={dogobj.Image}></a>
                   <Image src={dogobj.Image}></Image>
                   <CardBody
                     display={"Flex"}
                     flexDirection={"row"}
-                    justifyContent={"space-between"}
+                    justifyContent={"center"}
+                    padding={3}
                   >
-                    <Text color="black">{dogobj.name}</Text>
-                    <p
-                      style={{
-                        display: "flex",
-                        flexDirection: "column",
-                      }}
-                    >
-                      {!ismobile && (
-                        <Button
-                          margin={1}
-                          width={"100%"}
-                          onClick={() => savedogohandler(dogobj)}
-                        >
-                          Save
-                        </Button>
-                      )}
-
+                    <Text fontSize={"3xl"}>{dogobj.name}</Text>
+                  </CardBody>
+                  <CardFooter padding={3}>
+                    {!ismobile && (
                       <Button
                         margin={1}
                         width={"100%"}
-                        onClick={() => downloader(dogobj.Image)}
+                        onClick={() => savedogohandler(dogobj)}
+                        borderRadius={25}
                       >
-                        Down
+                        Save
                       </Button>
-                    </p>
-                  </CardBody>
+                    )}
+                    <Button
+                      borderRadius={25}
+                      margin={1}
+                      width={"100%"}
+                      onClick={() => downloader(dogobj.Image)}
+                    >
+                      Down
+                    </Button>
+                  </CardFooter>
                 </Card>
               );
             })}
           </SimpleGrid>
         </div>
+
         {saveddogo.length !== 0 && !ismobile ? (
           <div
             style={{
+              position: "relative",
+              right: 0,
               maxWidth: "15%",
               width: "100%",
+              overflow: "scroll",
             }}
             className="save"
           >
             <SimpleGrid
-              margin={2}
+              margin={1}
               borderWidth={2}
               height="800px"
               borderRadius={12}
-              backgroundColor={"#B8ADAD"}
+              backgroundColor={"inherit"}
+              padding={0}
             >
               <UnorderedList
                 display="flex"
                 flexDirection="column"
-                margin={4}
-                overflowX="hidden"
+                margin={3}
+                overflow="scroll"
               >
                 {saveddogo.map((dogo) => {
                   return (
-                    <li display="flex" flexDirection="column" key={Image}>
+                    <li
+                      borderRadius={10}
+                      display="flex"
+                      flexDirection="column"
+                      key={Image}
+                      overflow="hidden"
+                    >
                       <Image width="100%" height="auto" src={dogo.Image} />
                       <div className="div-buttondiv">
                         <Button
@@ -173,6 +192,7 @@ const PetGrid = () => {
                           height="30px"
                           onClick={() => deletedogo(dogo)}
                           color="white"
+                          borderBottomRadius={3}
                         >
                           <RiDeleteBack2Line height="100%"></RiDeleteBack2Line>
                         </Button>
@@ -185,12 +205,9 @@ const PetGrid = () => {
                           height="30px"
                           onClick={() => downloader(dogo.Image)}
                           color="white"
+                          borderBottomRadius={3}
                         >
                           <FaDownload></FaDownload>
-                          {/* <img
-                            style={{ width: "auto", height: "100%" }}
-                            src={FaDownload}
-                          ></img> */}
                         </Button>
                       </div>
                     </li>
@@ -204,106 +221,6 @@ const PetGrid = () => {
         )}
       </div>
     </div>
-
-    // <div
-    //   style={{
-    //     display: "flex",
-    //     flexDirection: "column",
-    //     alignItems: "center",
-    //   }}
-    // >
-    //   <div className="div-search">
-    //     <Input
-    //       placeholder="large size"
-    //       size="lg"
-    //       onChange={(e) => setsearch(e.target.value)}
-    //       display={"inline-block"}
-    //       width={"50%"}
-    //     />
-    //   </div>
-
-    //   <div className="dogogrid">
-    //     <SimpleGrid
-    //       columns={{ sm: 1, md: 2, lg: 3, xl: 4 }}
-    //       spacing={10}
-    //       margin={10}
-    //     >
-    //       {doginfo.map((dogobj) => {
-    //         return (
-    //           <Card overflow={"hidden"} borderRadius={25}>
-    //             <Image src={dogobj.Image}></Image>
-    //             <CardBody
-    //               display={"Flex"}
-    //               flexDirection={"row"}
-    //               justifyContent={"space-between"}
-    //             >
-    //               <Text color="black">{dogobj.name}</Text>
-    //               <p
-    //                 style={{
-    //                   display: "flex",
-    //                   flexDirection: "column",
-    //                 }}
-    //               >
-    //                 <Button
-    //                   margin={1}
-    //                   width={"100%"}
-    //                   onClick={() => savedogohandler(dogobj)}
-    //                 >
-    //                   Save
-    //                 </Button>
-    //                 <Button margin={1} width={"100%"}>
-    //                   Down
-    //                 </Button>
-    //               </p>
-    //             </CardBody>
-    //           </Card>
-    //         );
-    //       })}
-    //     </SimpleGrid>
-    //   </div>
-    //   <div className="div-saveddogogrid">
-    //     {saveddogo.length !== 0 ? (
-    //       <SimpleGrid
-    //         border="solid"
-    //         borderWidth={2}
-    //         height="800px"
-    //         borderRadius={12}
-    //         backgroundColor={"#B8ADAD"}
-    //       >
-    //         <UnorderedList
-    //           display="flex"
-    //           flexDirection="column"
-    //           margin={4}
-    //           overflowX="hidden"
-    //         >
-    //           {saveddogo.map((dogo) => {
-    //             return (
-    //               <li display="flex" flexDirection="column" key={Image}>
-    //                 <Image width="400px" height="auto" src={dogo.Image} />
-    //                 <Button
-    //                   width="100%"
-    //                   borderRadius={1}
-    //                   marginBottom={2}
-    //                   maxWidth={196.7}
-    //                   colorScheme="red"
-    //                   s
-    //                   height="30px"
-    //                   onClick={() => deletedogo(dogo)}
-    //                   color="white"
-    //                 >
-    //                   {" "}
-    //                   Remove
-    //                 </Button>
-    //               </li>
-    //             );
-    //           })}
-    //         </UnorderedList>
-    //       </SimpleGrid>
-    //     ) : (
-    //       ""
-    //     )}
-    //   </div>
-    // </div>
   );
 };
 
