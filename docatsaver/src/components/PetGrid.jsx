@@ -139,7 +139,7 @@ const PetGrid = () => {
                       width={"100%"}
                       onClick={() => downloader(dogobj.Image)}
                     >
-                      Down
+                      Download
                     </Button>
                   </CardFooter>
                 </Card>
