@@ -1,4 +1,4 @@
-import { HStack, Img } from "@chakra-ui/react";
+import { HStack, Img, color } from "@chakra-ui/react";
 import React from "react";
 import dogo from "../assets/headdogy.png";
 import { Button, ButtonGroup } from "@chakra-ui/react";

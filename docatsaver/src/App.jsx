@@ -12,12 +12,7 @@ function App() {
         lg: `"nav nav" "main down"`,
       }}
     >
-      <GridItem
-        border={"sold"}
-        // borderColor={"white"}
-        borderWidth={"3px"}
-        area="nav"
-      >
+      <GridItem border={"sold"} area="nav">
         <Navbar></Navbar>
       </GridItem>
       <GridItem area="main">
